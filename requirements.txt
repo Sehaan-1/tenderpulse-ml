@@ -1,0 +1,17 @@
+# Core ML / NLP
+torch>=2.0.0
+transformers>=4.30.0
+sentencepiece>=0.1.99
+tokenizers>=0.13.0
+
+# Data & notebook
+pandas>=2.0.0
+jupyter>=1.0.0
+matplotlib>=3.7.0
+
+# Testing & linting
+pytest>=7.4.0
+ruff>=0.1.0
+
+# Utilities
+python-dateutil>=2.8.0
