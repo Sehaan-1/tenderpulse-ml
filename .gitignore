@@ -117,6 +117,13 @@ cython_debug/
 # VS Code
 .vscode/
 
+# HuggingFace model cache
+.cache/
+.huggingface/
+
+# Jupyter lab
+.jupyterlab/
+
 # Data files (keep structure, ignore enriched outputs)
 data/enriched/
 *.csv
