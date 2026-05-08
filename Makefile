@@ -1,4 +1,4 @@
-.PHONY: install test classify classify-dry sanity clean lint format
+.PHONY: install test classify classify-dry evaluate sanity clean lint format
 
 PYTHON := python
 PIP := pip
@@ -20,6 +20,9 @@ classify:
 
 classify-dry:
 	@echo "Dry run: would classify data/raw/tenders.jsonl -> data/enriched/tenders_enriched.jsonl"
+
+evaluate:
+	python notebooks/phase4_eval.py
 
 sanity:
 	python scripts/check_pii.py

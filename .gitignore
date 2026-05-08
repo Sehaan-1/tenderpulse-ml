@@ -129,6 +129,10 @@ data/enriched/
 *.csv
 *.xlsx
 
+# Phase 4 evaluation annotations are manually curated project evidence.
+!data/evaluation_annotations.csv
+!data/evaluation_annotations_final.csv
+
 # Models
 models/
 
