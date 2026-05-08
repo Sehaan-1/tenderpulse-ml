@@ -125,7 +125,8 @@ cython_debug/
 .jupyterlab/
 
 # Data files (keep structure, ignore enriched outputs)
-data/enriched/
+data/enriched/*
+!data/enriched/tenders_enriched.jsonl
 *.csv
 *.xlsx
 
@@ -133,8 +134,13 @@ data/enriched/
 !data/evaluation_annotations.csv
 !data/evaluation_annotations_final.csv
 
-# Models
-models/
+# Full backup files (kept locally, not committed)
+*.full.jsonl
+
+# Models — metadata only; weights via scripts/export_model.py
+models/*
+!models/bart-large-mnli/
+models/bart-large-mnli/model.safetensors
 
 # Logs
 *.log
