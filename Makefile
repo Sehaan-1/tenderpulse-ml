@@ -1,4 +1,4 @@
-.PHONY: install test classify eval clean lint format
+.PHONY: install test classify classify-dry sanity clean lint format
 
 PYTHON := python
 PIP := pip
@@ -16,7 +16,10 @@ format:
 	ruff format src/ tests/ scripts/
 
 classify:
-	@echo "classify target is a stub for Phase 2+"
+	python src/classify.py --input data/raw/tenders.jsonl --output data/enriched/tenders_enriched.jsonl
+
+classify-dry:
+	@echo "Dry run: would classify data/raw/tenders.jsonl -> data/enriched/tenders_enriched.jsonl"
 
 sanity:
 	python scripts/check_pii.py
