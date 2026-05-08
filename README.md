@@ -10,7 +10,7 @@ Machine learning pipeline for classifying Indian government e-tender data from e
 | PII scanner | ✅ Done | `scripts/check_pii.py` — gates any data/enriched/ commit |
 | EDA | ✅ Done | `notebooks/01_eda.ipynb` — 769 tenders, 0% Hindi, 0% extraction failures |
 | Model selection | ✅ Done | `notebooks/02_model_selection.ipynb` — BART wins 4/5 vs mDeBERTa 3/5 |
-| Classification | — | Phase 3 pending |
+| Classification pipeline | ✅ Done | `src/classify.py` — BART zero-shot offline, ~20 min for 769 records |
 
 ## Quick Start
 
@@ -20,6 +20,15 @@ make install
 
 # Run tests
 make test
+
+# Export HuggingFace model to run classification offline
+python scripts/export_model.py
+
+# Run zero-shot classification (produces data/enriched/tenders_enriched.jsonl)
+make classify
+
+# Check classification output step-by-step without writing
+make classify-dry
 
 # Run PII scan
 python scripts/check_pii.py data/raw/tenders.jsonl
@@ -36,11 +45,16 @@ jupyter lab notebooks/02_model_selection.ipynb
 ```
 tenderpulse-ml/
 ├── src/
-│   └── title_cleaner.py         # extract_title() heuristic
+│   ├── __init__.py
+│   ├── title_cleaner.py         # Title extraction heuristics
+│   ├── labels.py                # Zero-shot candidate labels
+│   └── classify.py              # Classification pipeline
 ├── tests/
-│   └── test_title_cleaner.py    # 21 test cases
+│   ├── test_title_cleaner.py    # 21 test cases for title extraction
+│   └── test_classify.py         # 18 test cases for classification
 ├── scripts/
-│   └── check_pii.py             # PII scanner (mobile, email, officer prefixes)
+│   ├── check_pii.py             # PII scanner
+│   └── export_model.py          # Export HF models for offline use
 ├── notebooks/
 │   ├── 00_title_cleaning.ipynb  # Phase 1 validation: 50 before/after examples
 │   ├── 01_eda.ipynb             # Data quality: 769 tender records
@@ -48,10 +62,44 @@ tenderpulse-ml/
 ├── data/
 │   └── raw/
 │       └── tenders.jsonl        # 769 real eProcure records
+├── models/                      # Contains saved BART model for offline use
+│   └── bart-large-mnli/
+│       ├── config.json
+│       ├── model.safetensors
+│       ├── tokenizer.json
+│       └── tokenizer_config.json
 ├── requirements.txt
 ├── Makefile
 └── README.md
 ```
+
+## Classification Pipeline
+
+`tenderpulse-ml` uses **BART-large-mnli zero-shot classification** to assign one of three high-level categories to each tender:
+
+| Category | Description |
+|----------|-------------|
+| **Goods** | Physical items, equipment, supplies |
+| **Services** | Maintenance, consultancy, operations, support |
+| **Works** | Construction, renovation, civil/electrical works |
+
+Process per record:
+1. Clean the raw title using `extract_title()`
+2. Run the locally stored BART model offline
+3. Write `predicted_category` and `category_confidence` into the JSONL
+
+```bash
+# First time only: export the model to run offline entirely
+python scripts/export_model.py
+
+# Run the full classification
+make classify
+
+# Output
+# → data/enriched/tenders_enriched.jsonl
+```
+
+The model is loaded once and reused for all 769 records to avoid repeated overhead.
 
 ## Title Extraction
 
