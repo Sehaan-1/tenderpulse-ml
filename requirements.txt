@@ -2,7 +2,6 @@
 torch>=2.0.0
 transformers>=4.30.0
 sentencepiece>=0.1.99
-tokenizers>=0.13.0
 
 # Data & notebook
 pandas>=2.0.0
