@@ -47,6 +47,21 @@ This repo turns raw tender titles into a searchable category signal: **Goods**, 
 
 ---
 
+## The Dashboard
+
+A full-stack web interface lets you browse, classify, and evaluate tenders without writing code.
+
+| Feature | What you can do |
+|---|---|
+| **Dashboard** | See live stats: total tenders, category breakdown, average confidence, and recent records. |
+| **Tenders** | Search, filter, and browse the full enriched dataset in a paginated table. |
+| **Classify** | Upload raw `tenders.jsonl`, run ML classification, preview results, and download enriched JSONL. |
+| **Analytics** | View evaluation metrics, confidence buckets, confusion matrix, and error analysis. |
+
+**Stack:** FastAPI (backend) + React + Vite + MUI + MUI X Charts (frontend).
+
+---
+
 ## Results
 
 Manual evaluation was done on **125 predictions**: 100 proportional records plus 25 additional predicted-Goods records to inspect the minority class more honestly.
@@ -108,13 +123,14 @@ The committed data is intentionally small enough to review, while the crawler is
 ## How It Works
 
 ```mermaid
-flowchart LR
-    A["TenderPulse crawler<br/>(self-built)"] --> B["Raw eProcure JSONL"]
-    B --> C["Title extraction<br/>extract_title()"]
-    C --> D["Zero-shot classifier<br/>BART-large-MNLI"]
-    D --> E["Enriched JSONL<br/>predicted_category + confidence"]
-    E --> F["Manual evaluation<br/>metrics + error analysis"]
-```
+ flowchart LR
+     A["TenderPulse crawler<br/>(self-built)"] --> B["Raw eProcure JSONL"]
+     B --> C["Title extraction<br/>extract_title()"]
+     C --> D["Zero-shot classifier<br/>BART-large-MNLI"]
+     D --> E["Enriched JSONL<br/>predicted_category + confidence"]
+     E --> F["Manual evaluation<br/>metrics + error analysis"]
+     E --> G["Web Dashboard<br/>FastAPI + React + MUI"]
+ ```
 
 ### Pipeline
 
@@ -158,10 +174,28 @@ python scripts/export_model.py
 
 Run the classifier and evaluation:
 
-```bash
-make classify
-make evaluate
-```
+ ```bash
+ make classify
+ make evaluate
+ ```
+
+ ### Run the Dashboard
+
+ Start the backend server:
+
+ ```bash
+ cd backend
+ pip install -r requirements.txt
+ uvicorn main:app --reload --port 8000
+ ```
+
+ In a new terminal, start the frontend:
+
+ ```bash
+ cd frontend
+ npm install
+ npm run dev
+ ```
 
 Useful extras:
 
@@ -175,29 +209,46 @@ jupyter lab notebooks/03_evaluation.ipynb
 
 ## Repository Map
 
-```text
-tenderpulse-ml/
-|-- src/
-|   |-- title_cleaner.py
-|   |-- labels.py
-|   `-- classify.py
-|-- scripts/
-|   |-- check_pii.py
-|   `-- export_model.py
-|-- notebooks/
-|   |-- 00_title_cleaning.ipynb
-|   |-- 01_eda.ipynb
-|   |-- 02_model_selection.ipynb
-|   |-- 03_evaluation.ipynb
-|   `-- phase4_eval.py
-|-- data/
-|   |-- raw/tenders.jsonl
-|   |-- enriched/tenders_enriched.jsonl
-|   `-- evaluation_annotations_final.csv
-|-- tests/
-|-- Makefile
-`-- requirements.txt
-```
+ ```text
+ tenderpulse-ml/
+ |-- backend/
+ |   |-- main.py                  # FastAPI entry point
+ |   |-- data.py                  # Data layer and analytics
+ |   `-- api/
+ |       |-- classify.py          # File upload + classification endpoint
+ |       |-- tenders.py           # Search + listing endpoints
+ |       `-- analytics.py         # Dashboard metrics endpoints
+ |-- frontend/
+ |   |-- src/
+ |   |   |-- App.tsx              # Routing and theme
+ |   |   |-- theme.ts             # Dark / light MUI theme
+ |   |   |-- api/client.ts        # API fetch wrapper
+ |   |   |-- components/          # StatCard, charts, tables, layouts
+ |   |   |-- pages/               # Dashboard, Tenders, Classify, Analytics
+ |   |   `-- types/tender.ts      # TypeScript type definitions
+ |   |-- vite.config.ts
+ |   `-- package.json
+ |-- src/
+ |   |-- title_cleaner.py
+ |   |-- labels.py
+ |   `-- classify.py
+ |-- scripts/
+ |   |-- check_pii.py
+ |   `-- export_model.py
+ |-- notebooks/
+ |   |-- 00_title_cleaning.ipynb
+ |   |-- 01_eda.ipynb
+ |   |-- 02_model_selection.ipynb
+ |   |-- 03_evaluation.ipynb
+ |   `-- phase4_eval.py
+ |-- data/
+ |   |-- raw/tenders.jsonl
+ |   |-- enriched/tenders_enriched.jsonl
+ |   `-- evaluation_annotations_final.csv
+ |-- tests/
+ |-- Makefile
+ `-- requirements.txt
+ ```
 
 ---
 
