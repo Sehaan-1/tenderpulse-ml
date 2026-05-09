@@ -8,8 +8,6 @@ import logging
 import sys
 from pathlib import Path
 
-from transformers import pipeline
-
 # Ensure src/ is on path when running as script
 if __package__ is None or __package__ == "":
     _PROJECT_ROOT = Path(__file__).resolve().parent.parent
@@ -73,6 +71,8 @@ def classify_title(title: str, classifier) -> tuple[str, float]:
 
 def run(input_path: Path, output_path: Path) -> None:
     """Run classification pipeline on a JSONL file."""
+    from transformers import pipeline
+
     local_model_path = str(Path(__file__).resolve().parent.parent / "models" / "bart-large-mnli")
     logger.info("Loading BART-large-mnli model from %s (one-time load)...", local_model_path)
     classifier = pipeline(

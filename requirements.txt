@@ -8,6 +8,11 @@ pandas>=2.0.0
 jupyter>=1.0.0
 matplotlib>=3.7.0
 
+# Backend API
+fastapi>=0.111.0
+uvicorn[standard]>=0.30.0
+python-multipart>=0.0.9
+
 # Testing & linting
 pytest>=7.4.0
 ruff>=0.1.0
